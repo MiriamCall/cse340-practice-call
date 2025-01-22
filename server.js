@@ -8,8 +8,8 @@ import path from "path";
 const app = express();
 
 //Define important variables
-const MODE = process.env.MODE || "production";
-const PORT = process.env.PORT || 3000;
+const mode = process.env.MODE || "production";
+const port = process.env.PORT || 3000;
 
 // Create __dirname and __filename variables
 const __filename = fileURLToPath(import.meta.url);
@@ -21,13 +21,19 @@ app.set("view engine", "ejs");
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, "public")));
 
+//practice in class for middleware
+app.use((req, res, next) => {
+  console.log(req);
+  next();
+});
+
 //set the views directory
 app.set("views", path.join(__dirname, "views"));
 
 app.get("/", (req, res) => {
   const title = "Home Page";
   const content = "<h1>Welcome to the Home Page</h1>";
-  res.render("index", { title, content });
+  res.render("index", { title, content, mode, port });
 });
 
 app.get("/page1", (req, res) => {
@@ -58,8 +64,12 @@ app.get("/new-route", (req, res) => {
   res.send("This is a new route!");
 });
 
-//Define the port number the server will listen
-const port = 3000;
+//practice in class
+app.get("/explore/:name/:age/:id", (req, res) => {
+  // const name = req.params.name;
+  const { name, age, id } = req.params;
+  res.send("Check your computers console!");
+});
 
 //Start the server and listen on the specified port
 app.listen(port, () => {
