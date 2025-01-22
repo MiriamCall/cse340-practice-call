@@ -7,15 +7,21 @@ import path from "path";
 //create an instance of an Express application
 const app = express();
 
+//Define important variables
+const MODE = process.env.MODE || "production";
+const PORT = process.env.PORT || 3000;
+
 // Create __dirname and __filename variables
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+//Set the view engine to EJS
 app.set("view engine", "ejs");
 
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, "public")));
 
+//set the views directory
 app.set("views", path.join(__dirname, "views"));
 
 app.get("/", (req, res) => {
