@@ -30,9 +30,12 @@ app.use((req, res, next) => {
 //set the views directory
 app.set("views", path.join(__dirname, "views"));
 
+//Home page
 app.get("/", (req, res) => {
   const title = "Home Page";
   const content = "<h1>Welcome to the Home Page</h1>";
+  const mode = process.env.MODE;
+  const port = process.env.PORT;
   res.render("index", { title, content, mode, port });
 });
 
@@ -70,6 +73,24 @@ app.get("/explore/:name/:age/:id", (req, res) => {
   const { name, age, id } = req.params;
   res.send("Check your computers console!");
 });
+
+//When in development mode, start a WebSocket server for live reloading
+if (mode.includes("dev")) {
+  const ws = await import("ws");
+
+  try {
+    const wsPort = parseInt(port) + 1;
+    const wsServer = new ws.WebSocketServer({ port: wsPort });
+    wsServer.on("listening", () => {
+      console.log(`WebSocket server is running on port ${wsPort}`);
+    });
+    wsServer.on("error", (error) => {
+      console.error("WebSocket server error:", error);
+    });
+  } catch (error) {
+    console.error("Failed to start WebSocket server:", error);
+  }
+}
 
 //Start the server and listen on the specified port
 app.listen(port, () => {
