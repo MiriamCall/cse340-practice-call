@@ -18,6 +18,12 @@ const __dirname = path.dirname(__filename);
 //Set the view engine to EJS
 app.set("view engine", "ejs");
 
+// Global middleware to set a custom header
+app.use((req, res, next) => {
+  res.setHeader("X-Powered-By", "Express Middleware Tutorial");
+  next();
+});
+
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -27,8 +33,60 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use((req, res, next) => {
+  console.log(`Method: ${req.method}, URL: ${req.url}`);
+  next(); // Pass control to the next middleware or route
+});
+
 //set the views directory
 app.set("views", path.join(__dirname, "views"));
+
+// ID validation middleware
+const validateId = (req, res, next) => {
+  const { id } = req.params;
+  if (isNaN(id)) {
+    return res.status(400).send("Invalid ID: must be a number.");
+  }
+  next(); // Pass control to the next middleware or route
+};
+
+// Omitted the ID validation middleware for brevity
+
+// Middleware to validate name
+const validateName = (req, res, next) => {
+  const { name } = req.params;
+  if (!/^[a-zA-Z]+$/.test(name)) {
+    return res.status(400).send("Invalid name: must only contain letters.");
+  }
+  next();
+};
+
+// Account page route with ID and name validation
+app.get("/account/:name/:id", validateId, validateName, (req, res) => {
+  const title = "Account Page";
+  const { name, id } = req.params;
+  const isEven = id % 2 === 0 ? "even" : "odd";
+  const content = `
+      <h1>Welcome, ${name}!</h1>
+      <p>Your account ID is ${id}, which is an ${isEven} number.</p>
+  `;
+  res.render("index", { title, content, mode, port });
+});
+
+// Global middleware to add a timestamp to the request object
+app.use((req, res, next) => {
+  req.timestamp = new Date().toISOString();
+  next();
+});
+
+//Need to finish
+// Account page route with ID and name validation
+app.get("/account/:name/:id", validateName, validateId, (req, res) => {
+  // Existing code omitted for brevity
+  const timestamp = req.timestamp;
+  // Update your content to include the timestamp
+  res.render("index", { title, content, mode, port });
+});
 
 //Home page
 app.get("/", (req, res) => {
