@@ -67,11 +67,12 @@ app.get("/new-route", (req, res) => {
   res.send("This is a new route!");
 });
 
-//practice in class
-app.get("/explore/:name/:age/:id", (req, res) => {
-  // const name = req.params.name;
-  const { name, age, id } = req.params;
-  res.send("Check your computers console!");
+//account page (need to finish)
+app.get("/account/:name/:id", (req, res) => {
+  const title = "Account Page";
+  const { name, id } = req.params;
+  const content = "Welcome, ${name}! Your  account ID is ${id}";
+  res.render("index", { title, content, mode, port });
 });
 
 //When in development mode, start a WebSocket server for live reloading
