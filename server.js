@@ -151,6 +151,28 @@ if (mode.includes("dev")) {
   }
 }
 
+// Handle 404 errors by passing an error
+app.use((req, res, next) => {
+  const error = new Error("Page Not Found");
+  error.status = 404;
+  next(error);
+});
+
+// Centralized error handler
+app.use((err, req, res, next) => {
+  const status = err.status || 500;
+  const context = { mode, port };
+  res.status(status);
+  if (status === 404) {
+    context.title = "Page Not Found";
+    res.render("404", context);
+  } else {
+    context.title = "Internal Server Error";
+    context.error = err.message;
+    res.render("500", context);
+  }
+});
+
 //Start the server and listen on the specified port
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
